@@ -1,5 +1,8 @@
 # vue-mention-editor
 
+[![CI](https://github.com/alon-wu/vue-mention-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/alon-wu/vue-mention-editor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 基于 **Tiptap 3 + Vue 3 + TypeScript** 的提及（@mention）编辑器组件，可直接通过 npm 安装到 Vue 项目中使用。
 
 ## 特性

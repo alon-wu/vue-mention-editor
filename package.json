@@ -11,6 +11,14 @@
     "rich-text",
     "suggestion"
   ],
+  "homepage": "https://github.com/alon-wu/vue-mention-editor#readme",
+  "bugs": {
+    "url": "https://github.com/alon-wu/vue-mention-editor/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alon-wu/vue-mention-editor.git"
+  },
   "license": "MIT",
   "type": "module",
   "files": [
