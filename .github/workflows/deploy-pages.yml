@@ -1,0 +1,76 @@
+name: Deploy Site
+
+# 站点结构（同一个 Pages 站点）：
+#   https://alon-wu.github.io/vue-mention-editor/        ← 示例画廊（dist-demo）
+#   https://alon-wu.github.io/vue-mention-editor/docs/   ← 文档站（VitePress）
+# 两者由 `bun run build:site` 合并到 dist-site/ 后整体上传。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # 只在可能影响站点的改动上做构建验证；部署只发生在 main 上
+    paths:
+      - "docs/**"
+      - "dev/**"
+      - "src/**"
+      - "scripts/**"
+      - "*.ts"
+      - "*.html"
+      - "*.json"
+      - "bun.lock"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Pages 同时只允许一个部署，且不取消进行中的部署
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 构建站点
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v7
+
+      # 不指定 bun-version：自动读取 package.json 的 packageManager
+      - name: 安装 Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: 安装依赖
+        run: bun install --frozen-lockfile
+
+      - name: 构建示例画廊 + 文档站
+        run: bun run build:site
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v6
+
+      - name: 上传站点产物
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist-site
+
+  deploy:
+    name: 部署到 Pages
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 部署
+        id: deployment
+        uses: actions/deploy-pages@v5

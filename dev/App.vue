@@ -1,13 +1,45 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import ExampleCard from "./components/ExampleCard.vue";
 import { exampleGroups, examples } from "./examples";
 
-const activeId = ref(examples[0].id);
+/** 示例的两位编号（与侧边栏编号、文档里的深链一致） */
+const serialOf = (id: string) =>
+  String(examples.findIndex((example) => example.id === id) + 1).padStart(2, "0");
+
+/** 解析地址栏 hash：支持 `#06`（编号）与 `#basic`（示例 id）两种写法 */
+function matchHash(): string | undefined {
+  const hash = window.location.hash.replace(/^#/, "");
+  if (!hash) return undefined;
+  return examples.find((example) => example.id === hash || serialOf(example.id) === hash)?.id;
+}
+
+/** 初始选中：优先用深链，否则第一个示例 */
+const activeId = ref(matchHash() ?? examples[0].id);
 const activeIndex = computed(() =>
   Math.max(1, examples.findIndex((example) => example.id === activeId.value) + 1),
 );
 const active = computed(() => examples[activeIndex.value - 1] ?? examples[0]);
+
+/** 选中的示例同步到地址栏，方便直接复制链接分享（用 replace 避免污染后退历史） */
+watch(activeId, () => {
+  const next = `#${serialOf(activeId.value)}`;
+  if (window.location.hash !== next) window.history.replaceState(null, "", next);
+});
+
+/** 浏览器前进 / 后退或手动改 hash 时跟着切换 */
+const onHashChange = () => {
+  const id = matchHash();
+  if (id && id !== activeId.value) activeId.value = id;
+};
+
+onMounted(() => {
+  const next = `#${serialOf(activeId.value)}`;
+  if (window.location.hash !== next) window.history.replaceState(null, "", next);
+  window.addEventListener("hashchange", onHashChange);
+});
+
+onBeforeUnmount(() => window.removeEventListener("hashchange", onHashChange));
 
 /** 侧边栏：按分组顺序展示，编号与主区一致，方便对照 */
 const grouped = computed(() =>
@@ -52,7 +84,7 @@ const grouped = computed(() =>
         共 {{ examples.length }} 个示例，按「入门 → 外观 → 交互 → 集成 → AI
         场景」排列；每个示例下方的
         <strong>用法速览</strong> 会说明它绑定了什么值、触发了什么事件、用到了哪些 props / 插槽 /
-        方法。
+        方法。地址栏会跟着切换（如 <code>#06</code>），可直接复制分享某个示例。
       </p>
 
       <ExampleCard
@@ -69,8 +101,22 @@ const grouped = computed(() =>
       </ExampleCard>
 
       <footer class="gallery__footer">
-        <span>文档：docs/guide · docs/api</span>
-        <span>命令：bun run typecheck / bun run build</span>
+        <span>
+          在线文档：
+          <a
+            href="https://alon-wu.github.io/vue-mention-editor/docs/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            alon-wu.github.io/vue-mention-editor/docs
+          </a>
+        </span>
+        <span>
+          源码：
+          <a href="https://github.com/alon-wu/vue-mention-editor" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+        </span>
       </footer>
     </main>
   </div>

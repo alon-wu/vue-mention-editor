@@ -32,15 +32,15 @@ Tiptap suggestion 默认要求触发符出现在**行首或空格之后**（`all
 
 可以，三种写法：`placeholder="文案"`、`:placeholder="h('span', ...)"`（可在里面放 `kbd`、图标等行内块）、或使用 `#placeholder` 插槽（推荐，放任意组件）。占位内容由组件自己的浮层渲染，内容非空或 `disabled` 时自动隐藏。
 
-见 [Props：placeholder](../api/props.md#placeholder) 与 [示例](../../dev/examples/PlaceholderExample.vue)。
+见 [Props：placeholder](../api/props.md#placeholder) 与 [示例](../dev/examples/PlaceholderExample.vue)。
 
 ## 怎么控制高度 / 让输入框自动擑开？
 
-用 `min-rows` / `max-rows`：不足最小行数保持最小行高，超过最小行数自动擑开，超过最大行数出现滚动条。行高按编辑区实际计算行高换算，改字体后仍然准确。也可以直接用 `min-height` / `max-height`（优先级更高）。见 [按行数自适应高度示例](../../dev/examples/RowsExample.vue)。
+用 `min-rows` / `max-rows`：不足最小行数保持最小行高，超过最小行数自动擑开，超过最大行数出现滚动条。行高按编辑区实际计算行高换算，改字体后仍然准确。也可以直接用 `min-height` / `max-height`（优先级更高）。见 [按行数自适应高度示例](../dev/examples/RowsExample.vue)。
 
 ## 怎么彻底禁用输入框？
 
-`disabled` 会自动置灰、不可聚焦（优先级高于 `editable`）；只想「不可编辑但可复制」时用 `:editable="false"`。两者对比如见 [示例](../../dev/examples/DisabledExample.vue)。
+`disabled` 会自动置灰、不可聚焦（优先级高于 `editable`）；只想「不可编辑但可复制」时用 `:editable="false"`。两者对比如见 [示例](../dev/examples/DisabledExample.vue)。
 
 ## 怎么自定义「选中后的提及块」结构？
 
