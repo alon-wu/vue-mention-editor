@@ -12,6 +12,8 @@
 ```bash
 bun install        # 安装依赖
 bun run dev        # 启动 playground（示例画廊）：http://localhost:5173
+bun run docs:dev   # 启动文档站（VitePress，端口被占用时自动递增）
+bun run build:site # 构建完整站点（示例 + 文档 → dist-site/，与线上一致）
 bun run test       # vitest 单元 + 组件测试
 bun run typecheck  # vue-tsc 类型检查（含 tests/）
 bun run build      # 类型检查 + 构建库产物到 dist/
@@ -43,6 +45,8 @@ bun run build                   # 类型检查 + 库构建（dist/ 会作为 art
 
 - 改动过依赖就必须一并提交 `bun.lock`，否则 CI 的 `--frozen-lockfile` 会直接失败；
 - 浏览器手感类问题（chip 垂直对齐、Backspace 删除时机等）CI 测不出来，涉及这些改动的 PR 请附上本地验证说明。
+
+另有一个 `.github/workflows/deploy-pages.yml`：PR 上只做站点构建验证，合并到 `main` 后把示例画廊与文档站部署到 GitHub Pages（<https://alon-wu.github.io/vue-mention-editor/>）。文档站构建时会把指向仓库其它目录的链接改写成绝对地址，并把写错的相对链接当作死链报错——因此文档里的链接一旦写错，CI 就会拦住。
 
 ## 分支与合并流程
 
