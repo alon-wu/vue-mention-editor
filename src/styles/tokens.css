@@ -1,0 +1,144 @@
+/**
+ * vue-mention-editor 设计令牌
+ *
+ * 分两层，主题定制只需要覆盖第二层：
+ * 1. 基础令牌（调色板 / 间距 / 圆角 / 字号）—— 一般不用改
+ * 2. 语义令牌（`--vme-*` 组件真正读取的变量）
+ *
+ * 深色预设：给容器加 `data-vme-theme="dark"`（候选面板被挂载到 body，
+ * 需要同时把 trigger.container 指向该容器，见文档「外观定制」）。
+ */
+
+:root {
+  /* ===== 1. 基础令牌 ===== */
+  /* 中性色 */
+  --vme-gray-25: #fcfcfd;
+  --vme-gray-50: #f9fafb;
+  --vme-gray-100: #f3f4f6;
+  --vme-gray-200: #e5e7eb;
+  --vme-gray-300: #d1d5db;
+  --vme-gray-400: #9ca3af;
+  --vme-gray-500: #6b7280;
+  --vme-gray-600: #4b5563;
+  --vme-gray-700: #374151;
+  --vme-gray-800: #1f2937;
+  --vme-gray-900: #111827;
+
+  /* 品牌色 */
+  --vme-brand-50: #eef2ff;
+  --vme-brand-100: #e0e7ff;
+  --vme-brand-200: #c7d2fe;
+  --vme-brand-500: #6366f1;
+  --vme-brand-600: #4f46e5;
+  --vme-brand-700: #4338ca;
+  --vme-brand-800: #3730a3;
+  --vme-brand-900: #312e81;
+
+  /* 圆角 */
+  --vme-radius-xs: 4px;
+  --vme-radius-sm: 6px;
+  --vme-radius-md: 8px;
+  --vme-radius-lg: 12px;
+  --vme-radius-full: 999px;
+
+  /* 间距 */
+  --vme-space-1: 4px;
+  --vme-space-2: 6px;
+  --vme-space-3: 8px;
+  --vme-space-4: 10px;
+  --vme-space-5: 12px;
+  --vme-space-6: 16px;
+
+  /* 排版 */
+  --vme-font-size-sm: 12px;
+  --vme-font-size-md: 14px;
+  --vme-font-family: inherit;
+  --vme-line-height: 1.6;
+
+  /* 动效与层级 */
+  --vme-transition-fast: 120ms ease;
+  --vme-transition-base: 180ms ease;
+  --vme-z-popup: 1000;
+
+  /* ===== 2. 语义令牌（主题入口）===== */
+  /* 编辑区 */
+  --vme-bg: #ffffff;
+  --vme-text-color: var(--vme-gray-900);
+  --vme-muted-color: var(--vme-gray-500);
+  --vme-border-color: var(--vme-gray-200);
+  --vme-border-strong-color: var(--vme-gray-300);
+  --vme-primary-color: var(--vme-brand-600);
+  --vme-focused-border-color: var(--vme-primary-color);
+  --vme-focus-ring: 0 0 0 3px rgb(79 70 229 / 14%);
+  --vme-radius: var(--vme-radius-md);
+  --vme-font-size: var(--vme-font-size-md);
+  --vme-padding-x: var(--vme-space-5);
+  --vme-padding-y: var(--vme-space-4);
+  /* 编辑区高度（minHeight / maxHeight / minRows / maxRows 由组件计算后写在行内变量里） */
+  --vme-content-min-height: 96px;
+
+  /* 状态 */
+  --vme-readonly-bg: var(--vme-gray-50);
+  --vme-disabled-bg: var(--vme-gray-100);
+  --vme-disabled-text-color: var(--vme-gray-400);
+  --vme-placeholder-color: var(--vme-gray-400);
+
+  /* 提及块 */
+  --vme-mention-bg: var(--vme-brand-50);
+  --vme-mention-color: var(--vme-brand-800);
+  --vme-mention-radius: var(--vme-radius-xs);
+  --vme-mention-padding-x: 6px;
+
+  /* 候选面板 */
+  --vme-popup-bg: #ffffff;
+  --vme-popup-radius: var(--vme-radius-lg);
+  --vme-popup-shadow: 0 12px 32px -8px rgb(17 24 39 / 18%), 0 2px 8px rgb(17 24 39 / 6%);
+  --vme-popup-min-width: 240px;
+  --vme-popup-max-width: 380px;
+  --vme-popup-max-height: 288px;
+  --vme-popup-padding: var(--vme-space-1);
+  --vme-popup-header-height: 34px;
+
+  /* 候选项 */
+  --vme-item-height: 36px;
+  --vme-item-radius: var(--vme-radius-sm);
+  --vme-item-active-bg: var(--vme-brand-50);
+  --vme-item-active-color: var(--vme-brand-800);
+  --vme-avatar-size: 20px;
+
+  /* 滚动条 */
+  --vme-scrollbar-size: 8px;
+  --vme-scrollbar-thumb: var(--vme-gray-300);
+
+  /* 提及块悬浮提示 */
+  --vme-z-tip: 1100;
+  --vme-tip-bg: #ffffff;
+  --vme-tip-radius: var(--vme-radius-md);
+  --vme-tip-padding: var(--vme-space-2);
+  --vme-tip-max-width: 260px;
+  --vme-tip-media-width: 200px;
+  --vme-tip-media-ratio: 16 / 9;
+}
+
+/* ===== 3. 深色预设 ===== */
+[data-vme-theme="dark"] {
+  --vme-bg: var(--vme-gray-800);
+  --vme-text-color: #e5e7eb;
+  --vme-muted-color: var(--vme-gray-400);
+  --vme-border-color: var(--vme-gray-700);
+  --vme-border-strong-color: var(--vme-gray-600);
+  --vme-primary-color: #818cf8;
+  --vme-focus-ring: 0 0 0 3px rgb(129 140 248 / 24%);
+  --vme-readonly-bg: var(--vme-gray-900);
+  --vme-disabled-bg: var(--vme-gray-700);
+  --vme-disabled-text-color: var(--vme-gray-500);
+  --vme-placeholder-color: var(--vme-gray-500);
+  --vme-mention-bg: var(--vme-brand-900);
+  --vme-mention-color: var(--vme-brand-200);
+  --vme-popup-bg: var(--vme-gray-800);
+  --vme-popup-shadow: 0 16px 40px -12px rgb(0 0 0 / 55%);
+  --vme-item-active-bg: var(--vme-brand-900);
+  --vme-item-active-color: #e0e7ff;
+  --vme-scrollbar-thumb: var(--vme-gray-600);
+  --vme-tip-bg: var(--vme-gray-800);
+}

@@ -1,0 +1,96 @@
+# vue-mention-editor · 需求说明（唯一来源）
+
+> 定位：基于 Tiptap 3 + Vue 3 的提及（@mention）编辑器组件库，以 npm 包的形式在 Vue 3 项目中直接使用。
+> 开发与构建统一用 bun。目标不是玩具：API 稳定、样式可定制、文档/示例/测试齐全，能被真实项目直接依赖。
+>
+> 本文件是需求的唯一来源：**原始需求 → 验收标准 → 实现位置 → 文档 / 示例**。
+> 最后更新：2026-09-20（对应 v0.1.0）
+
+---
+
+## 〇、产品原则（默认值取向）
+
+**mention 编辑器的 v-model 默认是文本，不是 HTML。** 这类组件的真实场景是聊天输入、评论框、AI 对话输入框——拿到一条能直接提交给后端 / 大模型的字符串才是主路径；`@` 出去的东西（人、标签、图片、技能、资料）以 `@ + id` 的形式留在文本里。
+
+由此推出：
+
+- `valueFormat` 默认为 `'text'`；提及时 token 用 `id`（稳定、可往返），展示信息由 `textValue.resolve` 还原；
+- 想让值直接可读时可一处开关：`textValue.token: 'label'`（`@张三`），`resolve` 负责换回真实 id；`getText({ token })` / `getMarkdown({ token })` 可在任意地方取另一种形态；
+- 解析时只认「行首或空格后」的 `@token`（`textValue.allowedPrefixes`），避免把邮箱等普通文本误判为提及；
+- HTML / Markdown / JSON 是**扩展输出**：需要落库富文本、进 Prompt 或做结构化处理时，用 `getHTML()` / `getMarkdown()` / `getJSON()` 取；确实需要富文本值时再显式设 `value-format="html"`；
+- 示例与文档一律**先展示文本值，再给扩展输出**。
+
+---
+
+## 一、功能需求（P0，原始 7 条）
+
+| #   | 原始需求                                 | 验收标准                                                                                                       | 实现位置                                                                 | 文档                                | 示例                        |
+| --- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------- | --------------------------- |
+| 1   | 自定义 placeholder，支持字符串与行内块组件 | `placeholder` 支持 `string` / `VNode` / `#placeholder` 插槽；内容为空才显示；`disabled` 时不显示                | `MentionEditor.vue` 内置浮层 `.vme-placeholder`                          | `docs/api/props.md`、`slots-methods.md` | `PlaceholderExample.vue`    |
+| 2   | 最小 / 最大行数自适应                      | `min-rows` / `max-rows`（或 `min-height` / `max-height` 优先）按实测行高换算：不足最小行保持高度、超出自动撑开、超过最大行出现滚动条 | `MentionEditor.vue` → `updateSizing()`                                   | `docs/api/props.md`                 | `RowsExample.vue`           |
+| 3   | 支持禁用                                  | `disabled` 置灰且不可聚焦；`editable=false`（只读）可选中复制，两者语义分离                                    | `canEdit` computed + `.vme-root.is-disabled`                             | `docs/api/props.md`、`faq.md`        | `DisabledExample.vue`       |
+| 4   | 自定义候选列表样式结构                     | `triggers[].popupClass`、`MentionList` 的 `title` / `emptyText` / `loading` / `renderItem` / `renderEmpty`，以及 `#item`、`#empty` 插槽 | `MentionList.vue`、`core/suggestionRenderer.ts`                           | `docs/api/slots-methods.md`、`guide/customizing.md` | `CustomItemSlot.vue`、`ThemingExample.vue` |
+| 5   | 自定义选中后的提及块样式结构               | `mention-class`（类名）、`extra-attributes`（字段落库）、`mention-render-html`（DOM 结构）、`mention-render-text`（纯文本形态） | `extensions/mention.ts`、`MentionEditor.vue` 透传                         | `docs/guide/customizing.md`          | `MentionChipExample.vue`    |
+| 6   | AI 场景：`@` 资源，值为 `@+src`，资源删除同步 | v-model 默认（文本值）就是 `@+src` 纯文本；`mention-pool` 中被删掉的资源会连同内容里的引用一起清理（`prune-mentions` 默认开启） | `core/value.ts`、`MentionEditor.vue` → `pruneInvalidMentions()`            | `docs/guide/ai-resources.md`         | `AiResourceExample.vue`     |
+| 7   | AI 场景：根据绑定值恢复                    | 传入 `@+src` 文本即可还原为带缩略图的提及块（`textValue.resolve` 提供展示信息），往返一致；**数据后到时也能恢复**（`mention-pool` 变化自动补齐，或手动 `refreshMentions()`），且不改动绑定值 | `core/value.ts` → `parseTextToContent()`、`MentionEditor.refreshMentions()` | `docs/guide/ai-resources.md`         | `AiResourceExample.vue`     |
+
+## 二、AI 场景扩展（P1）
+
+| #   | 需求                                          | 验收标准                                                                                          | 实现位置                                        | 示例                      |
+| --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------- |
+| 8   | `/` 引用技能，且只能引用一个                   | `triggers[].limit = 1`，再次选择自动**替换**已有引用（`onLimit: 'replace'`，可选 `'ignore'`）       | `extensions/mention.ts` + `insertTriggeredMention` | `AiSkillExample.vue`      |
+| 9   | `#` 引用大段文本                              | chip 只显示标题并省略超出部分，完整正文放悬浮提示里滚动查看                                        | `mention-render-html` + `#mention-tip`           | `AiTextRefExample.vue`    |
+| 10  | 悬浮预览（不是写死的，可自定义）              | 组件负责命中检测 / 延迟 / 定位 / 「移入浮层不关闭」；内容由 `#mention-tip` 插槽决定。媒体规格用令牌控制：图片 `200px` 等比，视频与音频 `200px × 16:9` 且可直接播放 | `MentionEditor.vue` + `--vme-tip-media-width/ratio` | `AiResourceExample.vue`   |
+| 11  | chip 视觉规范（长标题不撑乱行高）              | 固定高度 chip 必须用内置 `vme-mention--pill`（或等价的 `vertical-align: middle` + `top: -0.12em`）才能与文字 / 光标居中对齐；**只截断标签**，前缀标识/图标始终可见；覆盖样式用 `:deep(.vme-content ...)` 提权 | `.vme-mention--pill`（MentionEditor 内置样式）+ 各 AI 示例          | AI 场景三个示例            |
+| 12  | 绑定值先到、资源后到也要能恢复样式            | `mention-pool` 变化时自动清理失效引用并补齐展示字段；也可手动 `refreshMentions()`；不写入撤销历史、不改动 v-model | `MentionEditor.refreshMentions()`                 | `docs/guide/ai-resources.md#三恢复textvalueresolve` | `AiResourceExample.vue`（① / ② 按钮） |
+
+## 三、工程与质量规范（P2）
+
+### 代码
+
+- **默认值取向**：v-model 默认文本（见第〇节）；演示扩展输出（HTML / Markdown / JSON）时必须显式声明这是扩展写法。
+- props / emits / ref 方法 / 导出函数必须有 JSDoc；对外类型集中定义在 `src/types/index.ts`，组件内不重复声明 payload 类型。
+- 组件内不出现魔法值：颜色、间距、圆角、层级一律走 `src/styles/tokens.css` 的语义令牌；示例走 `--demo-*` 令牌。
+- VNode 透传统一用 `core/vnodeView.ts`（稳定组件 + clone），禁止 `<component :is="() => vnode" />` 这类每次渲染新建组件类型的写法。
+- 触控/键盘可达性：面板支持 ↑↓ / Enter / Tab / Escape；编辑器 `role="textbox"`、`aria-multiline`。
+
+### 示例（dev 画廊）
+
+- 每个示例**只讲清一个能力点**，必须登记在 `dev/examples/index.ts`。
+- 每个示例必须填写 `usage` 元信息，画廊统一渲染成「速览」面板：
+  **绑定值 / 事件 / props / 插槽 / ref 方法 / 触发符配置 / 设计令牌 / 实现要点**。
+  —— 回答「这个效果是怎么来的、用了什么、触发了什么」。
+- 示例源码通过 `?raw` 展示，保证与实现永远一致；示例里出现的关键 API 名称必须与 `docs/` 一致。
+
+### 文档
+
+- `docs/` 分 `guide`（怎么用）与 `api`（有什么）：props、events、slots-methods、types、extensions。
+- 需求变更（尤其 prop 改名）必须全量搜索同步 README / docs / dev / tests / CHANGELOG。
+
+### 测试与校验
+
+- `tests/` 覆盖行为而非实现：value 序列化、扩展配置、面板交互、编辑器事件、上限替换、悬浮提示。
+- 每轮改动后执行：`bun run format:check && bun run typecheck && bun run test && bun run build`，并在浏览器把 18 个示例过一遍（控制台零报错）。
+
+## 四、验收清单（Definition of Done）
+
+- [ ] 一、二节所有需求都有「实现 + 文档 + 示例」三件套。
+- [ ] 每个示例在画廊里能一眼看到：绑定了什么、触发了什么事件、用了哪些 props / 插槽 / 方法、效果怎么实现。
+- [ ] `format:check` / `typecheck` / `test` / `build` 全绿。
+- [ ] 浏览器巡检：18 个示例零控制台报错，关键互动（悬浮预览、上限替换、资源清理、值恢复）表现符合预期。
+
+---
+
+## 附录：原始需求原文（2026-09-20 收到，未删改）
+
+```
+是否满足以下需求：
+1. 输入框是否可以自定义 placeholder 不仅支持普通字符串还要能支持 行内块组件
+2. 输入框是否可以设置 最小多少行最大多少行，默认最小行高度，超过最小行没超过最大行时自动撑开高度，超过最大行时产生滚动条
+3. 是否支持禁用
+4. 是否能自定义提及候选列表的样式结构
+5. 是否能自定义选中后的提及块的样式结构
+6. 在 AI 项目中 @ 的是上传的图片/视频/音频/文件等资源 双向绑定的值不是html是 @+src 而且删除已上传的文件 @ 了相同的文件也需要删除
+7. 在 AI 项目中 需要根据绑定的值恢复
+整体检查是否满足，不满足整体调研设计实现
+```

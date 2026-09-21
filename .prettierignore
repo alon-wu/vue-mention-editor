@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+bun.lock
+bun.lockb
+package-lock.json
+pnpm-lock.yaml
+*.min.js
+coverage
+.vite

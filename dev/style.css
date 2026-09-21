@@ -1,0 +1,323 @@
+/* =========================================================
+   playground 样式
+   与组件共用一套设计语言（颜色 / 间距 / 圆角 / 阴影一致），
+   令牌集中定义在下面的 :root 里，各示例不再写裸值。
+   ========================================================= */
+:root {
+  color-scheme: light;
+
+  --demo-bg: #f5f6f8;
+  --demo-surface: #ffffff;
+  --demo-surface-muted: #fbfcfd;
+  --demo-border: #e7e9ee;
+  --demo-border-strong: #d5d9e0;
+  --demo-text: #111827;
+  --demo-text-muted: #6b7280;
+  --demo-text-subtle: #9ca3af;
+  --demo-brand: #4f46e5;
+  --demo-brand-hover: #4338ca;
+  --demo-brand-soft: #eef2ff;
+  --demo-brand-border: #c7d2fe;
+  --demo-brand-text: #3730a3;
+  --demo-code-bg: #0f172a;
+  --demo-code-bar: #1b2437;
+  --demo-code-text: #e2e8f0;
+  --demo-code-muted: #94a3b8;
+  --demo-radius-sm: 6px;
+  --demo-radius-md: 10px;
+  --demo-radius-lg: 14px;
+  --demo-shadow-sm: 0 1px 2px rgb(17 24 39 / 6%);
+  --demo-shadow-md: 0 10px 28px -16px rgb(17 24 39 / 24%);
+  --demo-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+  font-size: 14px;
+  color: var(--demo-text);
+  background: var(--demo-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 32px 24px 64px;
+  background: var(--demo-bg);
+  color: var(--demo-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 画廊布局 ===== */
+.gallery__sidebar {
+  position: sticky;
+  top: 32px;
+  align-self: start;
+  padding: 20px;
+  border: 1px solid var(--demo-border);
+  border-radius: var(--demo-radius-lg);
+  background: var(--demo-surface);
+  box-shadow: var(--demo-shadow-sm);
+}
+
+.gallery__brand h1 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.gallery__brand p {
+  margin: 6px 0 12px;
+  color: var(--demo-text-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.gallery__brand code {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid var(--demo-border);
+  border-radius: var(--demo-radius-sm);
+  background: var(--demo-surface-muted);
+  color: var(--demo-text-muted);
+  font-family: var(--demo-font-mono);
+  font-size: 12px;
+}
+
+.gallery__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.nav-group__title {
+  margin-bottom: 6px;
+  padding-left: 10px;
+  color: var(--demo-text-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--demo-radius-sm);
+  background: transparent;
+  color: #374151;
+  font-size: 13.5px;
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.nav-item__serial {
+  flex-shrink: 0;
+  color: var(--demo-text-subtle);
+  font-family: var(--demo-font-mono);
+  font-size: 11px;
+}
+
+.nav-item__label {
+  min-width: 0;
+}
+
+.nav-item.is-active .nav-item__serial {
+  color: var(--demo-brand);
+}
+
+.nav-item:hover {
+  background: var(--demo-surface-muted);
+  color: var(--demo-text);
+}
+
+.nav-item.is-active {
+  background: var(--demo-brand-soft);
+  color: var(--demo-brand-text);
+  font-weight: 600;
+}
+
+.nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  width: 3px;
+  height: 18px;
+  border-radius: 0 3px 3px 0;
+  background: var(--demo-brand);
+  transform: translateY(-50%);
+}
+
+.gallery__main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--demo-border);
+  border-radius: var(--demo-radius-lg);
+  background: var(--demo-surface);
+  box-shadow: var(--demo-shadow-sm);
+}
+
+.gallery__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--demo-border);
+  color: var(--demo-text-subtle);
+  font-size: 12px;
+}
+
+/* =========================================================
+   示例通用元素（所有示例都用这些类，避免各写一套）
+   ========================================================= */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.muted {
+  margin: 0;
+  color: var(--demo-text-muted);
+  font-size: 12.5px;
+  line-height: 1.75;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--demo-border-strong);
+  border-radius: var(--demo-radius-sm);
+  background: var(--demo-surface);
+  color: #374151;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.btn:hover {
+  border-color: var(--demo-brand-border);
+  color: var(--demo-brand-text);
+}
+
+.btn:focus-visible {
+  outline: none;
+  border-color: var(--demo-brand);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 14%);
+}
+
+.btn.is-active {
+  border-color: var(--demo-brand-border);
+  background: var(--demo-brand-soft);
+  color: var(--demo-brand-text);
+  font-weight: 500;
+}
+
+.btn--primary {
+  border-color: var(--demo-brand);
+  background: var(--demo-brand);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  border-color: var(--demo-brand-hover);
+  background: var(--demo-brand-hover);
+  color: #fff;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  font-size: 13px;
+  user-select: none;
+}
+
+.kbd {
+  display: inline-block;
+  min-width: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--demo-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--demo-surface-muted);
+  color: #4b5563;
+  font-family: var(--demo-font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.output {
+  overflow: hidden;
+  border-radius: var(--demo-radius-md);
+  background: var(--demo-code-bg);
+}
+
+.output__title {
+  padding: 7px 14px;
+  background: var(--demo-code-bar);
+  color: var(--demo-code-muted);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+}
+
+.output pre {
+  margin: 0;
+  padding: 14px;
+  max-height: 240px;
+  overflow: auto;
+  color: var(--demo-code-text);
+  font-family: var(--demo-font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.log {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--demo-text-muted);
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+
+/* 深色主题：令牌内置预设，给容器加 data-vme-theme="dark" 即可；
+   候选面板挂载在 body 下，示例同时把 trigger.container 指向该容器（见 ThemingExample） */
