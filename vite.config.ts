@@ -19,6 +19,9 @@ export default defineConfig({
     // 与示例站点构建（vite.demo.config.ts）共用同一份别名，避免两处漂移
     alias: resolveAliases,
   },
+  // 库产物里不需要站点资源（favicon 等），public/ 只服务于示例站与本地开发
+  publicDir: false,
+
   build: {
     lib: {
       entry: "src/index.ts",
