@@ -9,6 +9,7 @@
 - **在线示例与文档站（GitHub Pages）**：示例画廊 <https://alon-wu.github.io/vue-mention-editor/> + 文档站 `/docs/`；`bun run build:site` 把两者合并成一个站点，`.github/workflows/deploy-pages.yml` 在 `main` 上自动部署（PR 上只做构建验证）
 - **示例画廊支持深链**：地址栏 `#01`–`#18` 对应具体示例，可复制分享；文档里的示例链接也直接指向在线示例
 - **文档站的链接改写**：docs 内部链接仍写相对路径（GitHub / 编辑器里照常可用），构建时把「指向 docs 之外」的链接改写成在线示例或 GitHub 源码地址，改写发生在死链检查之前，写错的相对链接依然会拦住构建
+- **站点图标**：品牌色 `@` 图标（`public/favicon.svg`），示例画廊与文档站共用；库构建已关闭 `publicDir`，图标不会进入 npm 包
 - **GitHub Actions CI**：`.github/workflows/ci.yml` —— push 到 `main` / 发起 PR 时自动跑 `format:check` → `typecheck` → `test` → `build`，并把 `dist/` 作为构建产物上传，避免坏代码合入
 - **`vme-mention--pill`**：内置的胶囊型提及块类——在 `renderHTML` 的根元素上追加这个类，尺寸 / 内边距 / 圆角 / 垂直对齐都由组件处理，使用者只写配色；自己写固定高度时用 `vertical-align: middle; position: relative; top: -0.12em;`（单个 `vertical-align` 值的参考点是元素自身基线，无法适配所有 chip 结构）
 - **文本 token 开关**：`textValue.token: 'id' | 'label'` —— 一处配置即可让 v-model 变成 `@张三` 这样直接可读的形式（回显时 `resolve` 负责换回真实 id，节点里存的仍是 id）；`getText({ token })` / `getMarkdown({ token })` 可随时在两种形态间取值，像 `getHTML()` 一样按需调用

@@ -47,6 +47,10 @@ export default defineConfig({
   description: "基于 Tiptap 3 + Vue 3 的提及（@mention）编辑器组件",
   base: "/vue-mention-editor/docs/",
 
+  // 站点图标在站点根目录（由示例站的构建从根目录 public/ 复制过来，见 build-site.ts）；
+  // 因此这里用的是站点绝对路径：线上有效，本地 `bun run docs:dev` 下图标会 404（不影响功能）
+  head: [["link", { rel: "icon", type: "image/svg+xml", href: "/vue-mention-editor/favicon.svg" }]],
+
   // 把文档里指向 docs 之外的相对链接改写成绝对地址（在线示例 / GitHub），
   // 改写发生在 VitePress 的死链检查之前，见 offsite-links.ts
   // 文档索引沿用 docs/README.md（GitHub 仓库页会直接渲染它），
@@ -66,7 +70,6 @@ export default defineConfig({
   markdown: {
     lineNumbers: true,
   },
-
   sitemap: {
     hostname: `${site}/docs/`,
   },
